@@ -20,29 +20,60 @@ function [ phantom ] = analytical_phantom(oL, oR)
     a16b = 0.443194085308632;
     b16b = 3.892760834372886;
     
-    E = [-4.7 4.3 1.79989 1.79989 0 0.010 0; %1
-          4.7 4.3 1.79989 1.79989 0 0.010 0; %2
-        -1.08 -9 0.4 0.4 0 0.0025 0; %3
-         1.08 -9 0.4 0.4 0 -0.0025 0; %4
-         0 0 9.6 12 0 1.800 0; %5
-         0 8.4 1.8 3.0 0 -1.050 0; %7
-         1.9 5.4 0.41633 1.17425 -31.07698 0.750 0; %8
-        -1.9 5.4 0.41633 1.17425 31.07698 0.750 0; %9
-        -4.3 6.8 1.8 0.24 -30 0.750 0; %10
-         4.3 6.8 1.8 0.24 30 0.750 0; %11
-         0 -3.6 1.8 3.6 0 -0.005 0; %12
-         6.39395 -6.39395 1.2 0.42 58.1 0.005 0; %13
-         0 3.6 2 2 0 0.750 4; %14
-         0 9.6 1.8 3.0 0 1.800 4; %15
-         0 0 9.0 11.4 0 0.750 3; %16a
-         0 y016b a16b b16b 0 0.750 1; %16b
-         0 0 9.0 11.4 0 -0.750 oR; %6
-         9.1 0 4.2 1.8 0 0.750 1];%R_ear
+    function [value] = valif(cond, val1, val2)
+        if (cond)
+            value = val1;
+        else
+            value = val2;
+        end
+    end
+    
+    % these values are summed yp
+    default = false;
+    tiss_1 = valif(default, 0.010, 1);   
+    tiss_2 = valif(default, 0.010, 1);
+    tiss_3 = valif(default, 0.0025,0);
+    tiss_4 = valif(default, -0.0025, 0);
+    tiss_5 = valif(default, 1.800, 3);    % white phantom part
+    tiss_6 = valif(default, -0.750, -2);  % internal phantom part
+    tiss_7 = valif(default, -1.050, -1);   % black oval on internal
+    tiss_8 = valif(default, 0.750, 2);
+    tiss_9 = valif(default, 0.750, 2);
+    tiss_10 = valif(default, 0.750, 2);
+    tiss_11 = valif(default, 0.750, 2);
+    tiss_12 = valif(default, -0.005, 0);
+    tiss_13 = valif(default, 0.005, 0);
+    tiss_14 = valif(default, 0.750, 2);
+    tiss_15 = valif(default, 1.800, 3);
+    tiss_16a = valif(default, 0.750, 2);
+    tiss_16b = valif(default, 0.750, 2);
+    tiss_R_ear = valif(default, 0.750, 2);
+    tiss_left_ear = valif(default, 0.750, 2);
+    tiss_right_ear = valif(default, -1.800, -3);
+    
+        E = [-4.7 4.3 1.79989 1.79989 0 tiss_1 0; %1
+          4.7 4.3 1.79989 1.79989 0 tiss_2 0; %2
+        -1.08 -9 0.4 0.4 0 tiss_3 0; %3
+         1.08 -9 0.4 0.4 0 tiss_4 0; %4
+         0 0 9.6 12 0 tiss_5 0; %5
+         0 8.4 1.8 3.0 0 tiss_7 0; %7
+         1.9 5.4 0.41633 1.17425 -31.07698 tiss_8 0; %8
+        -1.9 5.4 0.41633 1.17425 31.07698 tiss_9 0; %9
+        -4.3 6.8 1.8 0.24 -30 tiss_10 0; %10
+         4.3 6.8 1.8 0.24 30 tiss_11 0; %11
+         0 -3.6 1.8 3.6 0 tiss_12 0; %12
+         6.39395 -6.39395 1.2 0.42 58.1 tiss_13 0; %13
+         0 3.6 2 2 0 tiss_14 4; %14
+         0 9.6 1.8 3.0 0 tiss_15 4; %15
+         0 0 9.0 11.4 0 tiss_16a 3; %16a
+         0 y016b a16b b16b 0 tiss_16b 1; %16b
+         0 0 9.0 11.4 0 tiss_6 oR; %6
+         9.1 0 4.2 1.8 0 tiss_R_ear 1];%R_ear
 
     %generate the air cavities in the right ear
     cavity1 = transpose(8.8:-0.4:5.6);
     cavity2 = zeros(9,1);
-    cavity3_7 = ones(53,1)*[0.15 0.15 0 -1.800 0];
+    cavity3_7 = ones(53,1)*[0.15 0.15 0 tiss_right_ear 0];
     for j = 1:3 
         kj = 8-2*floor(j/3); 
         dj = 0.2*mod(j,2);
@@ -61,7 +92,7 @@ function [ phantom ] = analytical_phantom(oL, oR)
     y00 = zeros(0,0);
     ab = 0.5*ones(5,1)*d_xy;
     ab = ab(:)*ones(1,4);
-    leftear4_7 = [ab(:) ab(:) ones(80,1)*[0 0.750 0]];
+    leftear4_7 = [ab(:) ab(:) ones(80,1)*[0 tiss_left_ear 0]];
     for i = 1:4
         y00 = [y00; transpose(y0+(0:4)*2*d_xy(i))];
         x00 = [x00; (x0+2*(i-1)*d0_xy)*ones(5,1)];
