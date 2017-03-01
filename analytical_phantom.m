@@ -29,7 +29,7 @@ function [ phantom ] = analytical_phantom(oL, oR)
     end
     
     % these values are summed yp
-    default = false;
+    default = true;
     tiss_1 = valif(default, 0.010, 1);   
     tiss_2 = valif(default, 0.010, 1);
     tiss_3 = valif(default, 0.0025,0);
@@ -83,18 +83,19 @@ function [ phantom ] = analytical_phantom(oL, oR)
     E_cavity = [cavity1 cavity2 cavity3_7];
 
     %generate the left ear (resolution pattern)
+    leScale = 3;
     x0 = -7.0;
     y0 = -1.0;
-    d0_xy = 0.04;
+    d0_xy = 0.04 * leScale;   % spacing
 
     d_xy = [0.0357, 0.0312, 0.0278, 0.0250];
     x00 = zeros(0,0);
     y00 = zeros(0,0);
-    ab = 0.5*ones(5,1)*d_xy;
+    ab = (0.5 * leScale)*ones(5,1)*d_xy;
     ab = ab(:)*ones(1,4);
     leftear4_7 = [ab(:) ab(:) ones(80,1)*[0 tiss_left_ear 0]];
     for i = 1:4
-        y00 = [y00; transpose(y0+(0:4)*2*d_xy(i))];
+        y00 = [y00; transpose(y0+(0:4)*(2 * leScale)*d_xy(i))];
         x00 = [x00; (x0+2*(i-1)*d0_xy)*ones(5,1)];
     end
     x00 = x00*ones(1,4);
